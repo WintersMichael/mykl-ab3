@@ -20,7 +20,7 @@ export class Ab3CdkStack extends Stack {
         },
         sortKey: {
           name: 'price',
-          type: dynamodb.AttributeType.STRING
+          type: dynamodb.AttributeType.NUMBER
         }
     })
   }
