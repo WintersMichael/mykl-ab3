@@ -1,0 +1,93 @@
+[
+  {
+    "PutRequest": {
+      "Item": {
+        "id": {"S": "product"},
+        "sk": {"S": "P#1"},
+        "category": {"S": "Toys"},
+        "price": {"N": "19.95"},
+        "listing": {
+          "M": {
+            "name": {"S": "Happy Fun Ball"},
+            "description": {"S": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur purus sem, pretium at auctor in, pharetra sed quam. Vivamus suscipit placerat arcu pretium semper. Curabitur sollicitudin dui quis diam iaculis, pulvinar varius purus ornare. Sed ac ex vel quam varius congue. Donec quis arcu a nibh cursus viverra. Aliquam at nunc tellus. Duis id rutrum ipsum. Nullam sed massa ipsum. Duis eu ante eu leo condimentum ullamcorper.\nFusce dictum nibh sit amet dolor mollis, in blandit magna malesuada. Duis id enim enim. Quisque tellus metus, varius et lorem ut, rhoncus vehicula elit. Vestibulum pretium posuere est vitae vestibulum. Aliquam mollis commodo eros bibendum cursus. Nulla facilisi. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Maecenas eleifend eleifend eros aliquam mattis."},
+            "description_mobile": {"S": "It's super crazy bouncy happy fun ball!"},
+            "img_mobile": {"S": "hfb_128.jpg"},
+            "img": {"S": "hfb_256.jpg"},
+            "id": {"N": "1"},
+            "aggregate_rating": {"N": "4.8"}
+          }
+        }
+      }
+    }
+  },
+  {
+    "PutRequest": {
+      "Item": {
+        "id": {"S": "P#1"},
+        "sk": {"S": "R#1"},
+        "review": {
+          "M": {
+            "username": {"S": "Fred F."},
+            "rating": {"N": "4"},
+            "comment": {"S": "Yabba dabba buy it now!"}
+          }
+        }
+      }
+    }
+  },
+  {
+    "PutRequest": {
+      "Item": {
+        "id": {"S": "P#1"},
+        "sk": {"S": "R#2"},
+        "review": {
+          "M": {
+            "username": {"S": "Richard N."},
+            "rating": {"N": "5"},
+            "comment": {"S": "I might become a crook for happy fun ball!"}
+          }
+        }
+      }
+    }
+  },
+  {
+    "PutRequest": {
+      "Item": {
+        "id": {"S": "product"},
+        "sk": {"S": "P#2"},
+        "category": {"S": "Toys"},
+        "price": {"N": "9.95"},
+        "listing": {
+          "M": {
+            "name": {"S": "Pit Pat"},
+            "description": {"S": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur purus sem, pretium at auctor in, pharetra sed quam. Vivamus suscipit placerat arcu pretium semper. Curabitur sollicitudin dui quis diam iaculis, pulvinar varius purus ornare. Sed ac ex vel quam varius congue. Donec quis arcu a nibh cursus viverra. Aliquam at nunc tellus. Duis id rutrum ipsum. Nullam sed massa ipsum. Duis eu ante eu leo condimentum ullamcorper.\nFusce dictum nibh sit amet dolor mollis, in blandit magna malesuada. Duis id enim enim. Quisque tellus metus, varius et lorem ut, rhoncus vehicula elit. Vestibulum pretium posuere est vitae vestibulum. Aliquam mollis commodo eros bibendum cursus. Nulla facilisi. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Maecenas eleifend eleifend eros aliquam mattis."},
+            "description_mobile": {"S": "Pit Pat loves you!"},
+            "img_mobile": {"S": "pp_128.jpg"},
+            "img": {"S": "pp_256.jpg"},
+            "id": {"N": "2"},
+            "aggregate_rating": {"N": "4.6"}
+          }
+        }
+      }
+    }
+  },
+  {
+    "PutRequest": {
+      "Item": {
+        "id": {"S": "numproducts"},
+        "sk": {"S": "numproducts"},
+        "numproducts": {"N": "2"}
+      }
+    }
+  },
+  {
+    "PutRequest": {
+      "Item": {
+        "id": {"S": "numreviews"},
+        "sk": {"S": "numreviews"},
+        "numreviews": {"N": "2"}
+      }
+    }
+  }
+]
+
