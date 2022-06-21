@@ -74,6 +74,15 @@
   {
     "PutRequest": {
       "Item": {
+        "id": {"S": "auser"},
+        "sk": {"S": "C#P#1"},
+        "qty": {"N": "2"}
+      }
+    }
+  },
+  {
+    "PutRequest": {
+      "Item": {
         "id": {"S": "numproducts"},
         "sk": {"S": "numproducts"},
         "numproducts": {"N": "2"}

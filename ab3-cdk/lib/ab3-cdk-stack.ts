@@ -128,6 +128,9 @@ export class Ab3CdkStack extends Stack {
       name: 'AB3',
       authenticationType: 'API_KEY',
     });
+    const apiKey = new appsync.CfnApiKey(this, "AB3ApiKey", {
+      apiId: api.attrApiId
+    });
     const apiSchema = new appsync.CfnGraphQLSchema(this, 'Schema', {
       apiId: api.attrApiId,
       definition: `
@@ -137,12 +140,23 @@ export class Ab3CdkStack extends Stack {
         name: String
         description: String
         description_mobile: String
+        img_mobile: String
+        img: String
         aggregate_rating: Float
+        reviews: [Review]
+      }
+      
+      type Review {
+        id: ID!
+        username: String
+        rating: Float
+        comment: String
       }
       
       type Query {
         getAllProducts: [Product]
         getProduct(id: ID!): Product
+        getReviewsByProduct(id: ID!): [Review]
       }
       
       schema {
@@ -150,6 +164,7 @@ export class Ab3CdkStack extends Stack {
       }
       `
     });
+    //Data Sources
     const apiDDBRole = new iam.Role(this, "ApiDDB", {
       assumedBy: new iam.ServicePrincipal('appsync.amazonaws.com'),
       managedPolicies: [
@@ -166,6 +181,7 @@ export class Ab3CdkStack extends Stack {
         tableName: productsTable.tableName
       }
     });
+    // Resolvers
     const resolverAllProducts = new appsync.CfnResolver(this, "AllProductsResolver", {
       apiId: api.attrApiId,
       dataSourceName: apiDatasourceDDB.name,
@@ -192,10 +208,11 @@ export class Ab3CdkStack extends Stack {
       "name": $item.listing.name,
       "description": $item.listing.description,
       "description_mobile": $item.listing.description_mobile,
+      "img": $item.listing.img,
+      "img_mobile": $item.listing.img_mobile,
       "aggregate_rating": $item.listing.aggregate_rating
     }))
 #end
-
 $util.toJson($result)
       `
     });
@@ -205,12 +222,13 @@ $util.toJson($result)
       typeName: 'Query',
       fieldName: 'getProduct',
       requestMappingTemplate: `
+#set( $pid = "P#$ctx.args.id" )
 {
   "version": "2017-02-28",
   "operation": "GetItem",
   "key" : {
     "id": {"S": "product"},
-    "sk": $util.dynamodb.toDynamoDBJson($ctx.args.id)
+    "sk": $util.dynamodb.toDynamoDBJson($pid)
   },
 }
       `,
@@ -221,8 +239,72 @@ $util.toJson({
   "name": $ctx.result.listing.name,
   "description": $ctx.result.listing.description,
   "description_mobile": $ctx.result.listing.description_mobile,
+  "img": $ctx.result.listing.img,
+  "img_mobile": $ctx.result.listing.img_mobile,
   "aggregate_rating": $ctx.result.listing.aggregate_rating
 })
+      `
+    });
+    const resolverProductReviews = new appsync.CfnResolver(this, "ResolverProductReviews", {
+      apiId: api.attrApiId,
+      dataSourceName: apiDatasourceDDB.name,
+      typeName: 'Product',
+      fieldName: 'reviews',
+      requestMappingTemplate: `
+{
+  "version": "2017-02-28",
+  "operation": "Query",
+  "query" : {
+      "expression" : "id = :product_id AND begins_with(sk, :r)",
+      "expressionValues" : {
+          ":product_id" :  $util.dynamodb.toDynamoDBJson($ctx.source.id),
+          ":r" : {"S": "R"}
+      }
+  },
+}
+      `,
+      responseMappingTemplate: `
+#set( $result = [] )
+#foreach( $item in $ctx.result.items )
+  $util.qr($result.add({
+      "id": $item.sk,
+      "username": $item.review.username,
+      "rating": $item.review.rating,
+      "comment": $item.review.comment
+    }))
+#end
+$util.toJson($result)
+      `
+    });
+    const resolveReviewsByProduct = new appsync.CfnResolver(this, "ResolveReviewsByProduct", {
+      apiId: api.attrApiId,
+      dataSourceName: apiDatasourceDDB.name,
+      typeName: 'Query',
+      fieldName: 'getReviewsByProduct',
+      requestMappingTemplate: `
+{
+  "version": "2017-02-28",
+  "operation": "Query",
+  "query" : {
+      "expression" : "id = :product_id AND begins_with(sk, :r)",
+      "expressionValues" : {
+          ":product_id" :  $util.dynamodb.toDynamoDBJson($ctx.args.id),
+          ":r" : {"S": "R"}
+      }
+  },
+}
+      `,
+      responseMappingTemplate: `
+#set( $result = [] )
+#foreach( $item in $ctx.result.items )
+  $util.qr($result.add({
+      "id": $item.sk,
+      "username": $item.review.username,
+      "rating": $item.review.rating,
+      "comment": $item.review.comment
+    }))
+#end
+$util.toJson($result)
       `
     });
 
@@ -232,5 +314,6 @@ $util.toJson({
     new CfnOutput(this, 'CognitoPoolId', { value: userPool.userPoolId });
     new CfnOutput(this, 'CognitoClientId', { value: appClient.userPoolClientId });
     new CfnOutput(this, 'AppSyncURL', { value: api.attrGraphQlUrl });
+    new CfnOutput(this, 'AppSyncKeyID', { value: apiKey.attrApiKey });
   }
 }
