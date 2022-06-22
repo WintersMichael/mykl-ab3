@@ -1,0 +1,15 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-anyco-dev-191452-authRole",
+      "UnauthRoleArn": "arn:aws:iam::250136343996:role/amplify-anyco-dev-191452-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::250136343996:role/amplify-anyco-dev-191452-authRole",
+      "Region": "us-west-2",
+      "DeploymentBucketName": "amplify-anyco-dev-191452-deployment",
+      "UnauthRoleName": "amplify-anyco-dev-191452-unauthRole",
+      "StackName": "amplify-anyco-dev-191452",
+      "StackId": "arn:aws:cloudformation:us-west-2:250136343996:stack/amplify-anyco-dev-191452/36141800-d4ad-11ec-8858-0208c866790b",
+      "AmplifyAppId": "d3c4de0w6m76du"
+    }
+  }
+}

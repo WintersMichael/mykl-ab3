@@ -1,9 +1,15 @@
+# Mac crap
 .DS_Store
 
+# Node
 *.js
 !jest.config.js
 *.d.ts
 node_modules
 
+# CDK
 .cdk.staging
 cdk.out
+
+# React
+build/

@@ -1,0 +1,9 @@
+{
+  "AB3BackendStack": {
+    "CognitoClientId": "4mscin5c7mgnsuj239m1u304qi",
+    "AppSyncURL": "https://6zq235jflfdv3gyvqkatjhzzdi.appsync-api.us-west-2.amazonaws.com/graphql",
+    "AppSyncKeyID": "da2-fnu6p6iodfbvdd3722o6mtzjmu",
+    "ProductsTableName": "AB3BackendStack-AB3ProductsTable034D46D7-12KGO43MGIW53",
+    "CognitoPoolId": "us-west-2_0vhoNu6Q9"
+  }
+}

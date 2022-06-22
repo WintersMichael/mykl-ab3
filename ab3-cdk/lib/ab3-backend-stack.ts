@@ -1,17 +1,18 @@
-import { Stack, StackProps, CfnOutput } from 'aws-cdk-lib';
+import { Stack, StackProps, CfnOutput, RemovalPolicy } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { AwsCustomResource, AwsCustomResourcePolicy, PhysicalResourceId } from 'aws-cdk-lib/custom-resources'
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
 import * as logs from 'aws-cdk-lib/aws-logs';
-//import * as appsync from '@aws-cdk/aws-appsync-alpha';
 import * as appsync from 'aws-cdk-lib/aws-appsync';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import * as s3 from 'aws-cdk-lib/aws-s3';
+import * as s3deployment from 'aws-cdk-lib/aws-s3-deployment';
 
 import productsData from '../products-test-data.json';
 const region = 'us-west-2';
 
-export class Ab3CdkStack extends Stack {
+export class AB3BackendStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
     
@@ -20,6 +21,7 @@ export class Ab3CdkStack extends Stack {
       partitionKey: { name: 'id', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'sk', type: dynamodb.AttributeType.STRING },
       billingMode: dynamodb.BillingMode.PROVISIONED,
+      removalPolicy: RemovalPolicy.DESTROY
     });
     productsTable.addLocalSecondaryIndex({
         indexName: 'category-index',
@@ -129,7 +131,8 @@ export class Ab3CdkStack extends Stack {
       authenticationType: 'API_KEY',
     });
     const apiKey = new appsync.CfnApiKey(this, "AB3ApiKey", {
-      apiId: api.attrApiId
+      apiId: api.attrApiId,
+      expires: Math.floor(new Date().getTime() / 1000) + (86400 * 364) //today + 1yr
     });
     const apiSchema = new appsync.CfnGraphQLSchema(this, 'Schema', {
       apiId: api.attrApiId,
@@ -182,7 +185,7 @@ export class Ab3CdkStack extends Stack {
       }
     });
     // Resolvers
-    const resolverAllProducts = new appsync.CfnResolver(this, "AllProductsResolver", {
+    const resolverAllProducts = new appsync.CfnResolver(this, "ResolverAllProducts", {
       apiId: api.attrApiId,
       dataSourceName: apiDatasourceDDB.name,
       typeName: 'Query',
@@ -216,7 +219,9 @@ export class Ab3CdkStack extends Stack {
 $util.toJson($result)
       `
     });
-    const resolverProductByID = new appsync.CfnResolver(this, "ResolverProductByID", {
+    resolverAllProducts.addDependsOn(apiSchema);
+    resolverAllProducts.addDependsOn(apiDatasourceDDB);
+    const resolverGetProduct = new appsync.CfnResolver(this, "ResolverGetProduct", {
       apiId: api.attrApiId,
       dataSourceName: apiDatasourceDDB.name,
       typeName: 'Query',
@@ -245,6 +250,8 @@ $util.toJson({
 })
       `
     });
+    resolverGetProduct.addDependsOn(apiSchema);
+    resolverGetProduct.addDependsOn(apiDatasourceDDB);
     const resolverProductReviews = new appsync.CfnResolver(this, "ResolverProductReviews", {
       apiId: api.attrApiId,
       dataSourceName: apiDatasourceDDB.name,
@@ -276,7 +283,9 @@ $util.toJson({
 $util.toJson($result)
       `
     });
-    const resolveReviewsByProduct = new appsync.CfnResolver(this, "ResolveReviewsByProduct", {
+    resolverProductReviews.addDependsOn(apiSchema);
+    resolverProductReviews.addDependsOn(apiDatasourceDDB);
+    const resolverReviewsByProduct = new appsync.CfnResolver(this, "ResolverReviewsByProduct", {
       apiId: api.attrApiId,
       dataSourceName: apiDatasourceDDB.name,
       typeName: 'Query',
@@ -288,7 +297,7 @@ $util.toJson($result)
   "query" : {
       "expression" : "id = :product_id AND begins_with(sk, :r)",
       "expressionValues" : {
-          ":product_id" :  $util.dynamodb.toDynamoDBJson($ctx.args.id),
+        ":product_id" :  $util.dynamodb.toDynamoDBJson("P#\${ctx.args.id}"),
           ":r" : {"S": "R"}
       }
   },
@@ -307,6 +316,10 @@ $util.toJson($result)
 $util.toJson($result)
       `
     });
+    resolverReviewsByProduct.addDependsOn(apiSchema);
+    resolverReviewsByProduct.addDependsOn(apiDatasourceDDB);
+
+
 
 
 

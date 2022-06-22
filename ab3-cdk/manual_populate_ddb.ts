@@ -10,7 +10,7 @@ import productsData from './products-test-data.json';
     const client = new DynamoDBClient({ region: "us-west-2" });
     const putCmd = new BatchWriteItemCommand({
         "RequestItems": {
-          "Products": productsData
+          "Products": productsData // Hardcoded table named "Products" - change as needed
         }
     });
     try {
